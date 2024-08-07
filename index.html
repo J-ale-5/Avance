@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro y Puntuación de Grupos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1, h2 {
+            color: #004d99;
+        }
+        form {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #004d99;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003366;
+        }
+        .group-info, .leader-view {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .group-info div, .leader-view div {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Registro de Grupos</h1>
+        <div id="auth-section">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <label for="email">Correo Electrónico o Número de Celular</label>
+                <input type="text" id="email" required>
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+        </div>
+
+        <div id="group-section" style="display: none;">
+            <h2>Registrar Grupo y Puntaje</h2>
+            <form id="group-form">
+                <label for="group-name">Nombre del Grupo</label>
+                <input type="text" id="group-name" required>
+                <label for="points">Puntaje</label>
+                <input type="number" id="points" required>
+                <button type="submit">Registrar Puntaje</button>
+            </form>
+
+            <div class="group-info">
+                <h2>Puntajes de los Grupos</h2>
+                <div id="group-info-list"></div>
+            </div>
+
+            <div class="leader-view">
+                <h2>Suma de puntaje</h2>
+                <div id="leader-view-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            if (email) {
+                localStorage.setItem('user', email);
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('group-section').style.display = 'block';
+            }
+        });
+
+        document.getElementById('group-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const groupName = document.getElementById('group-name').value;
+            const points = document.getElementById('points').value;
+            if (groupName && points) {
+                const groupInfoList = document.getElementById('group-info-list');
+                const newGroupInfo = document.createElement('div');
+                newGroupInfo.textContent = `Grupo: ${groupName}, Puntaje: ${points}`;
+                groupInfoList.appendChild(newGroupInfo);
+
+                const leaderViewList = document.getElementById('leader-view-list');
+                const newLeaderView = document.createElement('div');
+                newLeaderView.textContent = `Grupo: ${groupName}, Puntaje: ${points}`;
+                leaderViewList.appendChild(newLeaderView);
+
+                const existingData = JSON.parse(localStorage.getItem('groupData')) || [];
+                existingData.push({ groupName, points });
+                localStorage.setItem('groupData', JSON.stringify(existingData));
+            }
+        });
+
+        window.addEventListener('load', function() {
+            const user = localStorage.getItem('user');
+            if (user) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('group-section').style.display = 'block';
+
+                const existingData = JSON.parse(localStorage.getItem('groupData')) || [];
+                const groupInfoList = document.getElementById('group-info-list');
+                const leaderViewList = document.getElementById('leader-view-list');
+
+                existingData.forEach(data => {
+                    const newGroupInfo = document.createElement('div');
+                    newGroupInfo.textContent = `Grupo: ${data.groupName}, Puntaje: ${data.points}`;
+                    groupInfoList.appendChild(newGroupInfo);
+
+                    const newLeaderView = document.createElement('div');
+                    newLeaderView.textContent = `Grupo: ${data.groupName}, Puntaje: ${data.points}`;
+                    leaderViewList.appendChild(newLeaderView);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
